@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cos.mustacheTest.Repository.bassballRepository">
+
+
+<select resultType="com.cos.mustacheTest.Dto.userListDto" id="userList">
+select us.id,us.name,us.position,us.userCreateDate,(SELECT COUNT(*) + 1
+ FROM user
+ WHERE name <![CDATA[ < ]]> us.name) as "rank"
+ from user us inner join team t on us.groubId = t.id
+order by us.name
+
+</select>
+
+<select id="findAllBunya" resultType="com.cos.mustacheTest.Dto.positionDto">
+select
+		p.position,
+		GROUP_CONCAT(if(t.teamName = '롯데자이언트', p.name, NULL)) AS 'lotte',
+		GROUP_CONCAT(if(t.teamName = '치바이글스', p.name, NULL)) AS 'chiba',
+		GROUP_CONCAT(if(t.teamName = '뉴욕양키즈', p.name, NULL)) AS 'Nowyork'
+		From user AS p
+		JOIN team AS t
+		ON p.groubId = t.id
+		group by position
+
+</select>
+
+
+<select resultType="com.cos.mustacheTest.Model.team" id="findAllTeam"> select * from team </select>
+
+<select resultType="com.cos.mustacheTest.Model.HomeBass" id="findAllHome"> select * from homeBass </select>
+
+<delete id="DeleteUser"> delete from user where id=#{id} </delete>
+
+<delete id="DeleteHome"> delete from HomeBass where id=#{id} </delete>
+
+<delete id="DeleteTeam"> delete from team where id=#{id} </delete>
+
+<insert id="saveUser" keyProperty="id" useGeneratedKeys="true"> insert into user(name,position,userCreateDate,groubId) values(#{name},#{position},now(),#{groubId}) </insert>
+
+<insert id="saveTeam"> insert into team(teamName,createDate) values (#{teamName},now()) </insert>
+
+<insert id="saveHome"> insert into HomeBass(homename,homeCreateDate) values (#{homename},now()) </insert>
+
+</mapper>
